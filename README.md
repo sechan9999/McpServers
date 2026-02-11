@@ -419,13 +419,13 @@ uv run pytest src/census-data/tests/
 
 ## API Keys
 
-| Service | API Key Required | Sign Up Link |
-|---------|------------------|--------------|
-| Census Bureau | Recommended | https://api.census.gov/data/key_signup.html |
-| SEC EDGAR | No | N/A |
-| FDA openFDA | No | N/A |
-| BLS | Yes | https://www.bls.gov/developers/api_signature_v2.htm |
-| EPA AQS | Yes | https://aqs.epa.gov/data/api/signup |
+| Service | API Key Required | Documentation/Sign Up Link |
+|---------|------------------|----------------------------|
+| Census Bureau | Recommended | [Census API Key](https://api.census.gov/data/key_signup.html) |
+| SEC EDGAR | No | [SEC EDGAR API](https://www.sec.gov/edgar/sec-api-documentation) |
+| FDA openFDA | No | [openFDA API](https://open.fda.gov/apis/) |
+| BLS | Yes | [BLS API Key](https://www.bls.gov/developers/api_signature_v2.htm) |
+| EPA AQS | Yes | [EPA AQS Sign Up](https://aqs.epa.gov/data/api/signup) |
 
 ## Contributing
 
