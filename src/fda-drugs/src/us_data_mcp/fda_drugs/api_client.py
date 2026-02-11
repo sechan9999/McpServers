@@ -338,3 +338,51 @@ class FDAAPIClient:
                 success=False,
                 error=str(e)
             )
+
+    async def search_devices(self, device_name: str, limit: int = 10) -> FDAResponse:
+        """Search for medical devices.
+        
+        Args:
+            device_name: Device name
+            limit: Max results
+            
+        Returns:
+            FDAResponse with medical device information
+        """
+        try:
+            url = f"{self.BASE_URL}/device/510k.json"
+            params = {
+                "search": f"device_name:{quote(device_name)}",
+                "limit": min(limit, 100)
+            }
+            response = await self.client.get(url, params=params)
+            response.raise_for_status()
+            data = response.json()
+            return FDAResponse(data=data.get("results", []), success=True)
+        except Exception as e:
+            return FDAResponse(data=[], success=False, error=str(e))
+
+    async def search_all_recalls(self, category: str, product_description: Optional[str] = None, limit: int = 10) -> FDAResponse:
+        """Search all FDA recalls (drug, food, or device).
+        
+        Args:
+            category: drug, food, or device
+            product_description: Product name/description
+            limit: Max results
+            
+        Returns:
+            FDAResponse with recall information
+        """
+        try:
+            url = f"{self.BASE_URL}/{category}/enforcement.json"
+            search_query = f"product_description:{quote(product_description)}" if product_description else ""
+            params = {"limit": min(limit, 100)}
+            if search_query:
+                params["search"] = search_query
+                
+            response = await self.client.get(url, params=params)
+            response.raise_for_status()
+            data = response.json()
+            return FDAResponse(data=data.get("results", []), success=True)
+        except Exception as e:
+            return FDAResponse(data=[], success=False, error=str(e))

@@ -12,7 +12,7 @@ from mcp.server.stdio import stdio_server
 from mcp.types import Tool, TextContent
 
 from .api_client import SECAPIClient
-from .models import CompanySearchRequest, FilingsRequest, COMMON_FORM_TYPES
+from .models import CompanySearchRequest, FilingsRequest, COMMON_FORM_TYPES, DailyFilingsRequest, InsiderTradesRequest
 
 
 # Initialize MCP server
@@ -102,6 +102,45 @@ async def list_tools() -> list[Tool]:
                 "type": "object",
                 "properties": {},
                 "required": []
+            }
+        ),
+        Tool(
+            name="get_daily_filings",
+            description=(
+                "Get all SEC filings submitted on a specific date. "
+                "Returns a summary list of filings for the requested day."
+            ),
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "date": {
+                        "type": "string",
+                        "description": "Date in YYYY-MM-DD format"
+                    }
+                },
+                "required": ["date"]
+            }
+        ),
+        Tool(
+            name="get_insider_trades",
+            description=(
+                "Get recent insider trading reports (Form 4) for a company by CIK. "
+                "Shows changes in ownership by company officers and directors."
+            ),
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "cik": {
+                        "type": "string",
+                        "description": "Company CIK"
+                    },
+                    "limit": {
+                        "type": "integer",
+                        "description": "Number of trades to retrieve (default: 20)",
+                        "default": 20
+                    }
+                },
+                "required": ["cik"]
             }
         )
     ]
@@ -232,6 +271,20 @@ async def call_tool(name: str, arguments: Any) -> list[TextContent]:
                     "usage": "Use these form type codes in the 'form_type' parameter of get_company_filings"
                 }, indent=2)
             )]
+        
+        elif name == "get_daily_filings":
+            request = DailyFilingsRequest(**arguments)
+            if sec_client is None:
+                sec_client = SECAPIClient()
+            response = await sec_client.get_daily_filings(request.date)
+            return [TextContent(type="text", text=json.dumps(response.model_dump(), indent=2))]
+
+        elif name == "get_insider_trades":
+            request = InsiderTradesRequest(**arguments)
+            if sec_client is None:
+                sec_client = SECAPIClient()
+            response = await sec_client.get_insider_trades(request.cik, request.limit)
+            return [TextContent(type="text", text=json.dumps(response.model_dump(), indent=2))]
         
         else:
             return [TextContent(

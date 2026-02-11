@@ -16,6 +16,8 @@ from .models import (
     DrugSearchRequest,
     RecallSearchRequest,
     AdverseEventRequest,
+    DeviceSearchRequest,
+    AllRecallSearchRequest,
     RECALL_CLASSIFICATIONS,
     COMMON_ADVERSE_REACTIONS
 )
@@ -154,6 +156,55 @@ async def list_tools() -> list[Tool]:
                 "type": "object",
                 "properties": {}
             }
+        ),
+        Tool(
+            name="search_devices",
+            description=(
+                "Search for FDA-regulated medical devices by name. "
+                "Returns 510(k) clearance information and manufacturer details."
+            ),
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "device_name": {
+                        "type": "string",
+                        "description": "Name of the medical device"
+                    },
+                    "limit": {
+                        "type": "integer",
+                        "description": "Max results",
+                        "default": 10
+                    }
+                },
+                "required": ["device_name"]
+            }
+        ),
+        Tool(
+            name="search_all_recalls",
+            description=(
+                "Search all FDA recalls including food, medical devices, and veterinary products. "
+                "Filter by category and product description."
+            ),
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "category": {
+                        "type": "string",
+                        "description": "Category: food, device, or drug",
+                        "enum": ["food", "device", "drug"]
+                    },
+                    "product_description": {
+                        "type": "string",
+                        "description": "Product name or keywords"
+                    },
+                    "limit": {
+                        "type": "integer",
+                        "description": "Max results",
+                        "default": 10
+                    }
+                },
+                "required": ["category"]
+            }
         )
     ]
 
@@ -214,6 +265,16 @@ async def call_tool(name: str, arguments: Any) -> list[TextContent]:
                     "usage": "Use classification codes (I, II, III) in search_recalls"
                 }, indent=2)
             )]
+        
+        elif name == "search_devices":
+            request = DeviceSearchRequest(**arguments)
+            response = await fda_client.search_devices(request.device_name, request.limit)
+            return [TextContent(type="text", text=json.dumps(response.model_dump(), indent=2))]
+
+        elif name == "search_all_recalls":
+            request = AllRecallSearchRequest(**arguments)
+            response = await fda_client.search_all_recalls(request.category, request.product_description, request.limit)
+            return [TextContent(type="text", text=json.dumps(response.model_dump(), indent=2))]
         
         else:
             return [TextContent(

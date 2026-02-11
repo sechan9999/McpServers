@@ -226,17 +226,16 @@ No API key required - uses public SEC EDGAR API.
 **Parameters:**
 - `query`: Company name, ticker symbol, or CIK
 
-`get_company_filings`: Get recent company filings
-
-**Parameters:**
-- `cik`: Central Index Key
-- `form_type`: Filing type filter (10-K, 10-Q, 8-K, etc.)
-- `count`: Number of filings to retrieve (default: 10)
-
 `get_company_facts`: Get company financial facts (XBRL data)
 
 **Parameters:**
 - `cik`: Central Index Key
+
+`get_insider_trades`: Get recent insider trading reports (Form 4)
+
+**Parameters:**
+- `cik`: Central Index Key
+- `limit`: Number of trades to retrieve (default: 20)
 
 `get_form_types`: Get reference list of SEC form types
 
@@ -246,6 +245,7 @@ No API key required - uses public SEC EDGAR API.
 "Find recent 10-K filings for Apple"
 "Search for company with ticker MSFT"
 "Get financial facts for CIK 0000320193"
+"Show recent insider trades for Tesla"
 ```
 
 ### FDA Drug Information (us-data-mcp.fda-drugs)
@@ -281,11 +281,25 @@ No API key required - uses public openFDA API.
 - `reaction`: Specific reaction/side effect (optional)
 - `limit`: Max results (default: 10)
 
+`search_devices`: Search for medical devices
+
+**Parameters:**
+- `device_name`: Device name
+- `limit`: Max results (default: 10)
+
+`search_all_recalls`: Search all FDA recalls (food, drug, device)
+
+**Parameters:**
+- `category`: Category (food, drug, device)
+- `product_description`: Product name or keywords
+- `limit`: Max results (default: 10)
+
 #### Usage Examples
 
 ```
 "Find FDA approval info for Lipitor"
-"Search for recent drug recalls"
+"Search for recent food recalls"
+"Get information on heart valve devices"
 "Get adverse event reports for aspirin"
 ```
 

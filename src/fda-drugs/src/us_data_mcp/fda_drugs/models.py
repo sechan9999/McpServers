@@ -30,6 +30,21 @@ class AdverseEventRequest(BaseModel):
     limit: int = Field(default=10, description="Maximum number of results", ge=1, le=100)
 
 
+class DeviceSearchRequest(BaseModel):
+    """Request model for medical device search."""
+    
+    device_name: str = Field(..., description="Medical device name")
+    limit: int = Field(default=10, description="Max results", ge=1, le=100)
+
+
+class AllRecallSearchRequest(BaseModel):
+    """Request model for all FDA recalls (food, drug, device)."""
+    
+    category: str = Field(..., description="Category: drug, food, or device")
+    product_description: Optional[str] = Field(None, description="Product description")
+    limit: int = Field(default=10, description="Max results", ge=1, le=100)
+
+
 class FDAResponse(BaseModel):
     """Response model for FDA data."""
     

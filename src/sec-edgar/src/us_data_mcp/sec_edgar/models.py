@@ -117,3 +117,16 @@ SIC_CATEGORIES = {
     "7000-8999": "Services",
     "9100-9729": "Public Administration",
 }
+
+
+class DailyFilingsRequest(BaseModel):
+    """Request model for daily filings."""
+    
+    date: str = Field(..., description="Date of filings (YYYY-MM-DD)")
+
+
+class InsiderTradesRequest(BaseModel):
+    """Request model for insider trades."""
+    
+    cik: str = Field(..., description="Company CIK")
+    limit: int = Field(default=20, description="Max results", ge=1, le=100)
