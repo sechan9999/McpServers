@@ -55,17 +55,17 @@ us-data-mcp.bls-labor
 ```
 Bureau of Labor Statistics employment and economic data
 
+```
+us-data-mcp.epa-airquality
+```
+EPA air quality and environmental monitoring
+
 ### Phase 2 - Extended Servers (Coming Soon)
 
 ```
 us-data-mcp.usa-spending
 ```
 Federal spending, contracts, and grants
-
-```
-us-data-mcp.epa-airquality
-```
-EPA air quality and environmental monitoring
 
 ## Installation & Setup
 
@@ -83,6 +83,9 @@ uv pip install us-data-mcp.fda-drugs
 
 # BLS labor statistics server
 uv pip install us-data-mcp.bls-labor
+
+# EPA air quality server
+uv pip install us-data-mcp.epa-airquality
 ```
 
 ### Using pip
@@ -99,6 +102,9 @@ pip install us-data-mcp.fda-drugs
 
 # BLS labor statistics server
 pip install us-data-mcp.bls-labor
+
+# EPA air quality server
+pip install us-data-mcp.epa-airquality
 ```
 
 ### Claude Desktop Configuration
@@ -131,6 +137,14 @@ Add MCP servers to your Claude Desktop configuration file:
       "args": ["us-data-mcp.bls-labor@latest"],
       "env": {
         "BLS_API_KEY": "your-api-key-here"
+      }
+    },
+    "us-data-mcp.epa-airquality": {
+      "command": "uvx",
+      "args": ["us-data-mcp.epa-airquality@latest"],
+      "env": {
+        "EPA_AQS_EMAIL": "your-email@example.com",
+        "EPA_AQS_KEY": "your-api-key-here"
       }
     }
   }
@@ -207,31 +221,31 @@ No API key required - uses public SEC EDGAR API.
 
 #### Available Tools
 
-`search_company`: Search for company information
+`search_company`: Search for companies by name, ticker, or CIK
 
 **Parameters:**
-- `company_name`: Company name or ticker symbol
-- `cik`: Central Index Key (optional)
+- `query`: Company name, ticker symbol, or CIK
 
-`get_filings`: Get company filings
+`get_company_filings`: Get recent company filings
 
 **Parameters:**
 - `cik`: Central Index Key
-- `form_type`: Filing type (10-K, 10-Q, 8-K, etc.)
-- `count`: Number of recent filings to retrieve (default: 10)
+- `form_type`: Filing type filter (10-K, 10-Q, 8-K, etc.)
+- `count`: Number of filings to retrieve (default: 10)
 
-`get_filing_content`: Get specific filing content
+`get_company_facts`: Get company financial facts (XBRL data)
 
 **Parameters:**
-- `accession_number`: Filing accession number
 - `cik`: Central Index Key
+
+`get_form_types`: Get reference list of SEC form types
 
 #### Usage Examples
 
 ```
 "Find recent 10-K filings for Apple"
-"Get the latest 8-K filing for Tesla"
 "Search for company with ticker MSFT"
+"Get financial facts for CIK 0000320193"
 ```
 
 ### FDA Drug Information (us-data-mcp.fda-drugs)
@@ -287,34 +301,53 @@ export BLS_API_KEY="your-api-key-here"  # Get from https://www.bls.gov/developer
 
 #### Available Tools
 
-`get_employment_data`: Get employment statistics
+`get_series_data`: Fetch data for BLS series IDs
 
 **Parameters:**
-- `series_id`: BLS series ID
+- `series_ids`: List of series IDs (e.g., ["LNS14000000"])
 - `start_year`: Start year
 - `end_year`: End year
 
-`search_cpi`: Get Consumer Price Index data
-
-**Parameters:**
-- `area`: Geographic area code
-- `item`: CPI item code
-- `start_year`: Start year
-- `end_year`: End year
-
-`get_unemployment_rate`: Get unemployment rate
-
-**Parameters:**
-- `state`: State name or code
-- `start_year`: Start year
-- `end_year`: End year
+`get_common_series`: Get reference list of common series IDs
 
 #### Usage Examples
 
 ```
-"Get unemployment rate for California from 2020 to 2023"
-"Find CPI data for urban areas"
-"Show employment statistics for the tech sector"
+"Get national unemployment rate from 2020 to 2023"
+"Find CPI data for inflation analysis"
+"Show total nonfarm employment statistics"
+```
+
+### EPA Air Quality (us-data-mcp.epa-airquality)
+
+Access EPA Air Quality System (AQS) environmental data.
+
+#### Environment Variables
+
+```bash
+export EPA_AQS_EMAIL="your-email@example.com"
+export EPA_AQS_KEY="your-api-key-here"  # Get from https://aqs.epa.gov/data/api/signup
+```
+
+#### Available Tools
+
+`get_daily_air_quality`: Fetch daily air quality summaries
+
+**Parameters:**
+- `param_code`: Pollutant parameter code (e.g., "44201" for Ozone)
+- `bdate`: Begin date (YYYYMMDD)
+- `edate`: End date (YYYYMMDD)
+- `state`: 2-digit State FIPS code
+- `county`: 3-digit County FIPS code (optional)
+
+`get_common_aqs_parameters`: Get reference list of pollutant codes
+
+#### Usage Examples
+
+```
+"Get Ozone levels in California for July 2023"
+"Find PM2.5 levels in Los Angeles County"
+"Show common air pollutant codes for EPA data"
 ```
 
 ## Developer Guide
@@ -374,10 +407,11 @@ uv run pytest src/census-data/tests/
 
 | Service | API Key Required | Sign Up Link |
 |---------|------------------|--------------|
-| Census Bureau | Recommended (higher rate limits) | https://api.census.gov/data/key_signup.html |
+| Census Bureau | Recommended | https://api.census.gov/data/key_signup.html |
 | SEC EDGAR | No | N/A |
 | FDA openFDA | No | N/A |
 | BLS | Yes | https://www.bls.gov/developers/api_signature_v2.htm |
+| EPA AQS | Yes | https://aqs.epa.gov/data/api/signup |
 
 ## Contributing
 
@@ -399,3 +433,4 @@ Inspired by the [Korean data.go.kr MCP servers](https://github.com/sechan9999/da
 - [SEC EDGAR API](https://www.sec.gov/edgar/sec-api-documentation)
 - [openFDA API](https://open.fda.gov/apis/)
 - [BLS API Documentation](https://www.bls.gov/developers/)
+- [EPA AQS API](https://aqs.epa.gov/data/api)
